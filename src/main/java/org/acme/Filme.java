@@ -30,6 +30,9 @@ public class Filme extends PanacheEntityBase {
     @Min(value = 0, message = "Idade indicativa não pode ser negativa")
     public int idadeIndicativa;
 
+    @Enumerated(EnumType.STRING)
+    public StatusFilme status;
+
     // Many-to-One: vários filmes para um diretor
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "diretor_id")
@@ -46,12 +49,13 @@ public class Filme extends PanacheEntityBase {
 
     public Filme() {}
 
-    public Filme(Long id, String titulo, String sinopse, int anoLancamento, double nota, int idadeIndicativa) {
+    public Filme(Long id, String titulo, String sinopse, int anoLancamento, double nota, int idadeIndicativa, StatusFilme status) {
         this.id = id;
         this.titulo = titulo;
         this.sinopse = sinopse;
         this.anoLancamento = anoLancamento;
         this.nota = nota;
         this.idadeIndicativa = idadeIndicativa;
+        this.status = status;
     }
 }

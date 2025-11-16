@@ -1,12 +1,11 @@
 package org.acme;
 
-import java.util.ArrayList;
+import org.acme.dto.PagedResponse;
+
 import java.util.List;
 
-public class SearchFilmeResponse {
-    public List<Filme> Filmes = new ArrayList<>();
-    public long TotalFilmes;
-    public int TotalPages;
-    public boolean HasMore;
-    public String NextPage;
+public class SearchFilmeResponse extends PagedResponse<Filme> {
+    public SearchFilmeResponse(List<Filme> filmes, long totalFilmes, int totalPages) {
+        super(filmes, totalFilmes, totalPages);
+    }
 }

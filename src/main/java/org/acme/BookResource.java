@@ -11,12 +11,14 @@ import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
 import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
+import org.acme.security.ApiKeyRequired;
+import org.acme.security.Idempotent;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-@Path("/books") // é utilizando este @path que indica que esta classe está relacionada a rotas da API
+@Path("/api/v1/books") // é utilizando este @path que indica que esta classe está relacionada a rotas da API
 public class BookResource {
 
     @GET
@@ -89,19 +91,35 @@ public class BookResource {
 
         var query = (q == null || q.isBlank() ? Book.findAll(sortObj) : Book.find("lower(titulo) like ?1 or lower(autor) like ?1", sortObj, "%" + q.toLowerCase() + "%"));
 
+        long totalElements = query.count();
+        int totalPages = query.pageCount();
         List<Book> books = query.page(effectivePage, size).list();
 
-        var response = new SearchBookResponse();
-        response.Books = books;
-        response.TotalBooks = query.list().size();
-        response.TotalPages = query.pageCount();
-        response.HasMore = page < query.pageCount();
-        response.NextPage = response.HasMore ? "http://localhost:8080/books/search?q="+q+"&page="+(page + 1) + (size >  0 ? "&size="+size : "") : "";
+        var response = new SearchBookResponse(books, totalElements, totalPages);
+
+        // HATEOAS Links
+        String baseUrl = "http://localhost:8080/api/v1/books/search";
+        String queryParams = String.format("?q=%s&sort=%s&direction=%s&size=%d",
+                (q != null ? q : ""), sort, direction, size);
+
+        response.links.put("self", baseUrl + queryParams + "&page=" + effectivePage);
+        response.links.put("first", baseUrl + queryParams + "&page=0");
+
+        if (effectivePage > 0) {
+            response.links.put("prev", baseUrl + queryParams + "&page=" + (effectivePage - 1));
+        }
+        if (effectivePage < totalPages - 1) {
+            response.links.put("next", baseUrl + queryParams + "&page=" + (effectivePage + 1));
+        }
+
+        response.links.put("last", baseUrl + queryParams + "&page=" + (totalPages - 1));
 
         return Response.ok(response).build();
     };
 
     @POST // não é necessário um path pois temos apenas um post
+    @Idempotent
+    @ApiKeyRequired
     @RequestBody( // Explica o esquema da requisão
             required = true,
             content = @Content(
@@ -130,6 +148,7 @@ public class BookResource {
     }
 
     @DELETE
+    @ApiKeyRequired
     @Transactional // colocamos transactional quando fazemos alguma alteração no banco de dados
     @Path("{id}")
     public Response delete(@PathParam("id") int id){
@@ -142,6 +161,7 @@ public class BookResource {
     }
 
     @PUT
+    @ApiKeyRequired
     @Transactional // colocamos transactional quando fazemos alguma alteração no banco de dados
     @Path("{id}")
     public Response update(@PathParam("id") int id, Book newBook){

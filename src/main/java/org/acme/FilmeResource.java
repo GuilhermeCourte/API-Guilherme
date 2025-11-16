@@ -13,12 +13,14 @@ import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
 import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
+import org.acme.security.ApiKeyRequired;
+import org.acme.security.Idempotent;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-@Path("/filmes")
+@Path("/api/v1/filmes")
 public class FilmeResource {
 
     @GET
@@ -95,7 +97,7 @@ public class FilmeResource {
             @Parameter(description = "Define quantos objetos serão retornados por query")
             @QueryParam("size") @DefaultValue("4") int size
     ){
-        Set<String> allowed = Set.of("id", "titulo", "sinopse", "anoLancamento", "nota", "idadeIndicativa");
+        Set<String> allowed = Set.of("id", "titulo", "sinopse", "anoLancamento", "nota", "idadeIndicativa", "status");
         if(!allowed.contains(sort)){
             sort = "id";
         }
@@ -133,19 +135,35 @@ public class FilmeResource {
             }
         }
 
+        long totalElements = query.count();
+        int totalPages = query.pageCount();
         List<Filme> filmes = query.page(effectivePage, size).list();
 
-        var response = new SearchFilmeResponse();
-        response.Filmes = filmes;
-        response.TotalFilmes = query.list().size();
-        response.TotalPages = query.pageCount();
-        response.HasMore = effectivePage < query.pageCount() - 1; // Faz o pagecount - 1 pois a pagina 1 seria o indice 0, a comparação é feita com o índice da última página valida
-        response.NextPage = response.HasMore ? "http://localhost:8080/filmes/search?q="+(q != null ? q : "")+"&page="+(effectivePage + 1) + (size > 0 ? "&size="+size : "") : "";
+        var response = new SearchFilmeResponse(filmes, totalElements, totalPages);
+
+        // HATEOAS Links
+        String baseUrl = "http://localhost:8080/api/v1/filmes/search";
+        String queryParams = String.format("?q=%s&sort=%s&direction=%s&size=%d",
+                (q != null ? q : ""), sort, direction, size);
+
+        response.links.put("self", baseUrl + queryParams + "&page=" + effectivePage);
+        response.links.put("first", baseUrl + queryParams + "&page=0");
+
+        if (effectivePage > 0) {
+            response.links.put("prev", baseUrl + queryParams + "&page=" + (effectivePage - 1));
+        }
+        if (effectivePage < totalPages - 1) {
+            response.links.put("next", baseUrl + queryParams + "&page=" + (effectivePage + 1));
+        }
+
+        response.links.put("last", baseUrl + queryParams + "&page=" + (totalPages - 1));
 
         return Response.ok(response).build();
     }
 
     @POST
+    @Idempotent
+    @ApiKeyRequired
     @Operation(
             summary = "Adiciona um registro a lista de filmes (insert)",
             description = "Adiciona um item a lista de filmes por meio de POST e request body JSON"
@@ -210,6 +228,7 @@ public class FilmeResource {
     }
 
     @DELETE
+    @ApiKeyRequired
     @Operation(
             summary = "Remove um registro da lista de filmes (delete)",
             description = "Remove um item da lista de filmes por meio de Id na URL"
@@ -245,6 +264,7 @@ public class FilmeResource {
     }
 
     @PUT
+    @ApiKeyRequired
     @Operation(
             summary = "Altera um registro da lista de filmes (update)",
             description = "Edita um item da lista de filmes por meio de Id na URL e request body JSON"
@@ -283,6 +303,7 @@ public class FilmeResource {
         entity.anoLancamento = newFilme.anoLancamento;
         entity.nota = newFilme.nota;
         entity.idadeIndicativa = newFilme.idadeIndicativa;
+        entity.status = newFilme.status;
 
         // Resolver diretor
         if(newFilme.diretor != null && newFilme.diretor.id != null){

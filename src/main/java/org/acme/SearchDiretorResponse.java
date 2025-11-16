@@ -1,12 +1,11 @@
 package org.acme;
 
-import java.util.ArrayList;
+import org.acme.dto.PagedResponse;
+
 import java.util.List;
 
-public class SearchDiretorResponse {
-    public List<Diretor> Diretores = new ArrayList<>();
-    public long TotalDiretores;
-    public int TotalPages;
-    public boolean HasMore;
-    public String NextPage;
+public class SearchDiretorResponse extends PagedResponse<Diretor> {
+    public SearchDiretorResponse(List<Diretor> diretores, long totalDiretores, int totalPages) {
+        super(diretores, totalDiretores, totalPages);
+    }
 }

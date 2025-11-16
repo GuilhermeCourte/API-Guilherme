@@ -13,11 +13,13 @@ import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
 import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
+import org.acme.security.ApiKeyRequired;
+import org.acme.security.Idempotent;
 
 import java.util.List;
 import java.util.Set;
 
-@Path("/generos")
+@Path("/api/v1/generos")
 public class GeneroResource {
     @GET
     @Operation(
@@ -114,19 +116,35 @@ public class GeneroResource {
                     "lower(nome) like ?1", sortObj, "%" + q.toLowerCase() + "%");
         }
 
+        long totalElements = query.count();
+        int totalPages = query.pageCount();
         List<Genero> generos = query.page(effectivePage, size).list();
 
-        var response = new SearchGeneroResponse();
-        response.Generos = generos;
-        response.TotalGeneros = query.list().size();
-        response.TotalPages = query.pageCount();
-        response.HasMore = effectivePage < query.pageCount() - 1; // Faz o pagecount - 1 pois a pagina 1 seria o indice 0, a comparação é feita com o índice da última página valida
-        response.NextPage = response.HasMore ? "http://localhost:8080/generos/search?q="+(q != null ? q : "")+"&page="+(effectivePage + 1) + (size > 0 ? "&size="+size : "") : "";
+        var response = new SearchGeneroResponse(generos, totalElements, totalPages);
+
+        // HATEOAS Links
+        String baseUrl = "http://localhost:8080/api/v1/generos/search";
+        String queryParams = String.format("?q=%s&sort=%s&direction=%s&size=%d",
+                (q != null ? q : ""), sort, direction, size);
+
+        response.links.put("self", baseUrl + queryParams + "&page=" + effectivePage);
+        response.links.put("first", baseUrl + queryParams + "&page=0");
+
+        if (effectivePage > 0) {
+            response.links.put("prev", baseUrl + queryParams + "&page=" + (effectivePage - 1));
+        }
+        if (effectivePage < totalPages - 1) {
+            response.links.put("next", baseUrl + queryParams + "&page=" + (effectivePage + 1));
+        }
+
+        response.links.put("last", baseUrl + queryParams + "&page=" + (totalPages - 1));
 
         return Response.ok(response).build();
     }
 
     @POST
+    @Idempotent
+    @ApiKeyRequired
     @Operation(
             summary = "Adiciona um registro a lista de generos (insert)",
             description = "Adiciona um item a lista de generos por meio de POST e request body JSON"
@@ -159,6 +177,7 @@ public class GeneroResource {
     }
 
     @DELETE
+    @ApiKeyRequired
     @Operation(
             summary = "Remove um registro da lista de generos (delete)",
             description = "Remove um item da lista de generos por meio de Id na URL"
@@ -204,6 +223,7 @@ public class GeneroResource {
     }
 
     @PUT
+    @ApiKeyRequired
     @Operation(
             summary = "Altera um registro da lista de generos (update)",
             description = "Edita um item da lista de generos por meio de Id na URL e request body JSON"

@@ -10,7 +10,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-@Path("/hello")
+@Path("/api/v1/hello")
 public class GreetingResource {
 
     @GET

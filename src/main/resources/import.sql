@@ -46,40 +46,40 @@ insert into genero (nome, descricao) values('Fantasia Sombria', 'Mistura de fant
 insert into genero (nome, descricao) values('Aventura', 'Jornadas épicas, descobertas e desafios pessoais');
 insert into genero (nome, descricao) values('Drama', 'Narrativas emocionais profundas sobre a condição humana');
 
-insert into filme (titulo, sinopse, anoLancamento, nota, idadeIndicativa, diretor_id) values(
+insert into filme (titulo, sinopse, anoLancamento, nota, idadeIndicativa, diretor_id, status) values(
                                                                                                 'Duna',
                                                                                                 'O herdeiro de uma família nobre, Paul Atreides, é incumbido de proteger o planeta mais valioso da galáxia de forças malignas. O planeta é a única fonte de "especiaria", uma droga que prolonga a vida humana.',
-                                                                                                2021, 9.1, 14, 3
+                                                                                                2021, 9.1, 14, 3, 'EM_CARTAZ'
                                                                                             );
 
-insert into filme (titulo, sinopse, anoLancamento, nota, idadeIndicativa, diretor_id) values(
+insert into filme (titulo, sinopse, anoLancamento, nota, idadeIndicativa, diretor_id, status) values(
                                                                                                 'Blade Runner 2049',
                                                                                                 'Um jovem "blade runner" descobre um segredo enterrado há muito tempo que tem o potencial de mergulhar o que resta da sociedade no caos.',
-                                                                                                2017, 8.8, 16, 3
+                                                                                                2017, 8.8, 16, 3, 'FORA_DE_CARTAZ'
                                                                                             );
 
-insert into filme (titulo, sinopse, anoLancamento, nota, idadeIndicativa, diretor_id) values(
+insert into filme (titulo, sinopse, anoLancamento, nota, idadeIndicativa, diretor_id, status) values(
                                                                                                 'Beetlejuice',
                                                                                                 'Um casal recém-falecido contrata um bio-exorcista para assustar os novos e irritantes moradores de sua casa.',
-                                                                                                1988, 8.5, 12, 1
+                                                                                                1988, 8.5, 12, 1, 'FORA_DE_CARTAZ'
                                                                                             );
 
-insert into filme (titulo, sinopse, anoLancamento, nota, idadeIndicativa, diretor_id) values(
+insert into filme (titulo, sinopse, anoLancamento, nota, idadeIndicativa, diretor_id, status) values(
                                                                                                 'O Fantástico Sr. Raposo',
                                                                                                 'Um raposo, que deixou a vida de ladrão para se dedicar à família, volta aos velhos hábitos e coloca em risco a vida de todos ao seu redor.',
-                                                                                                2009, 8.2, 0, 2
+                                                                                                2009, 8.2, 0, 2, 'FORA_DE_CARTAZ'
                                                                                             );
 
-insert into filme (titulo, sinopse, anoLancamento, nota, idadeIndicativa, diretor_id) values(
+insert into filme (titulo, sinopse, anoLancamento, nota, idadeIndicativa, diretor_id, status) values(
                                                                                                 'Lady Bird: A Hora de Voar',
                                                                                                 'Uma estudante do último ano do ensino médio navega em um relacionamento tumultuado com sua mãe enquanto sonha em se mudar para uma cidade grande para a faculdade.',
-                                                                                                2017, 8.6, 14, 4
+                                                                                                2017, 8.6, 14, 4, 'FORA_DE_CARTAZ'
                                                                                             );
 
-insert into filme (titulo, sinopse, anoLancamento, nota, idadeIndicativa, diretor_id) values(
+insert into filme (titulo, sinopse, anoLancamento, nota, idadeIndicativa, diretor_id, status) values(
                                                                                                 'Interestelar',
                                                                                                 'Um grupo de exploradores espaciais viaja através de um buraco de minhoca em busca de um novo lar para a humanidade, que está à beira da extinção na Terra.',
-                                                                                                2014, 9.3, 12, 3
+                                                                                                2014, 9.3, 12, 3, 'FORA_DE_CARTAZ'
                                                                                             );
 
 insert into filme_genero (filme_id, genero_id) values (1, 1), (1, 6), (1, 5);

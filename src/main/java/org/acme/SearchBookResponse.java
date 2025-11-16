@@ -1,15 +1,11 @@
 package org.acme;
 
-import java.util.ArrayList;
+import org.acme.dto.PagedResponse;
+
 import java.util.List;
 
-public class SearchBookResponse {
-
-    // Entidade para fazer os HTO's
-
-    public List<Book> Books = new ArrayList<>();
-    public long TotalBooks;
-    public int TotalPages;
-    public boolean HasMore;
-    public String NextPage;
+public class SearchBookResponse extends PagedResponse<Book> {
+    public SearchBookResponse(List<Book> books, long totalBooks, int totalPages) {
+        super(books, totalBooks, totalPages);
+    }
 }
