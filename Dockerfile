@@ -13,5 +13,8 @@ RUN chmod +x mvnw
 # Build the app.
 RUN ./mvnw -DoutputFile=target/mvn-dependency-list.log -B -DskipTests clean dependency:list install
 
+# Expose the port the application runs on
+EXPOSE 8080
+
 # Run the quarkus app
 CMD ["sh", "-c", "java -jar target/quarkus-app/quarkus-run.jar"]
