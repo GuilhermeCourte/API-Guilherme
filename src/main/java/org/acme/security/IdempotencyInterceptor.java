@@ -8,7 +8,6 @@ import jakarta.interceptor.InvocationContext;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.Response;
 import org.acme.IdempotencyRecord;
-import org.jboss.resteasy.reactive.ResteasyReactive;
 
 import java.util.Optional;
 
@@ -26,7 +25,11 @@ public class IdempotencyInterceptor {
 
     @AroundInvoke
     public Object checkIdempotency(InvocationContext context) throws Exception {
-        HttpHeaders headers = ResteasyReactive.getContextData(HttpHeaders.class);
+        HttpHeaders headers = JaxRsContextHolder.getHeaders();
+        if (headers == null) {
+            // Should not happen if the ContextFilter is configured correctly
+            return context.proceed();
+        }
         String idempotencyKey = headers.getHeaderString(IDEMPOTENCY_KEY_HEADER);
 
         if (idempotencyKey == null || idempotencyKey.isBlank()) {
