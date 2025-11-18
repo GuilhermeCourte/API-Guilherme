@@ -18,7 +18,7 @@ public class ApiKeyResource {
                     .build();
         }
         ApiKey newKey = ApiKey.generate(clientName);
-        ApiKey.persist(newKey);
+        newKey.persist();
         return Response.status(Response.Status.CREATED).entity(newKey).build();
     }
 }
