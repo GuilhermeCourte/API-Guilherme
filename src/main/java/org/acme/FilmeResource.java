@@ -16,11 +16,12 @@ import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.acme.security.ApiKeyRequired;
 import org.acme.security.Idempotent;
 
+import org.acme.dto.FilmeSearchResponse;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-@Path("/api/v1/filmes")
+@Path("/filmes")
 public class FilmeResource {
 
     @GET
@@ -81,7 +82,7 @@ public class FilmeResource {
             description = "Item retornado com sucesso",
             content = @Content(
                     mediaType = "application/json",
-                    schema = @Schema(implementation = Filme.class, type = SchemaType.ARRAY)
+                    schema = @Schema(implementation = FilmeSearchResponse.class)
             )
     )
     @Path("/search")
@@ -139,24 +140,11 @@ public class FilmeResource {
         int totalPages = query.pageCount();
         List<Filme> filmes = query.page(effectivePage, size).list();
 
-        var response = new SearchFilmeResponse(filmes, totalElements, totalPages);
+        boolean hasMore = effectivePage < totalPages - 1;
+        String nextPage = hasMore ? String.format("/filmes/search?q=%s&sort=%s&direction=%s&page=%d&size=%d",
+                q != null ? q : "", sort, direction, effectivePage + 1, size) : null;
 
-        // HATEOAS Links
-        String baseUrl = "http://localhost:8080/api/v1/filmes/search";
-        String queryParams = String.format("?q=%s&sort=%s&direction=%s&size=%d",
-                (q != null ? q : ""), sort, direction, size);
-
-        response.links.put("self", baseUrl + queryParams + "&page=" + effectivePage);
-        response.links.put("first", baseUrl + queryParams + "&page=0");
-
-        if (effectivePage > 0) {
-            response.links.put("prev", baseUrl + queryParams + "&page=" + (effectivePage - 1));
-        }
-        if (effectivePage < totalPages - 1) {
-            response.links.put("next", baseUrl + queryParams + "&page=" + (effectivePage + 1));
-        }
-
-        response.links.put("last", baseUrl + queryParams + "&page=" + (totalPages - 1));
+        var response = new FilmeSearchResponse(filmes, totalElements, totalPages, hasMore, nextPage);
 
         return Response.ok(response).build();
     }

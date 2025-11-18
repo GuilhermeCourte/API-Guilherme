@@ -16,10 +16,11 @@ import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.acme.security.ApiKeyRequired;
 import org.acme.security.Idempotent;
 
+import org.acme.dto.GeneroSearchResponse;
 import java.util.List;
 import java.util.Set;
 
-@Path("/api/v1/generos")
+@Path("/generos")
 public class GeneroResource {
     @GET
     @Operation(
@@ -79,7 +80,7 @@ public class GeneroResource {
             description = "Item retornado com sucesso",
             content = @Content(
                     mediaType = "application/json",
-                    schema = @Schema(implementation = Genero.class, type = SchemaType.ARRAY)
+                    schema = @Schema(implementation = GeneroSearchResponse.class)
             )
     )
     @Path("/search")
@@ -120,24 +121,11 @@ public class GeneroResource {
         int totalPages = query.pageCount();
         List<Genero> generos = query.page(effectivePage, size).list();
 
-        var response = new SearchGeneroResponse(generos, totalElements, totalPages);
+        boolean hasMore = effectivePage < totalPages - 1;
+        String nextPage = hasMore ? String.format("/generos/search?q=%s&sort=%s&direction=%s&page=%d&size=%d",
+                q != null ? q : "", sort, direction, effectivePage + 1, size) : null;
 
-        // HATEOAS Links
-        String baseUrl = "http://localhost:8080/api/v1/generos/search";
-        String queryParams = String.format("?q=%s&sort=%s&direction=%s&size=%d",
-                (q != null ? q : ""), sort, direction, size);
-
-        response.links.put("self", baseUrl + queryParams + "&page=" + effectivePage);
-        response.links.put("first", baseUrl + queryParams + "&page=0");
-
-        if (effectivePage > 0) {
-            response.links.put("prev", baseUrl + queryParams + "&page=" + (effectivePage - 1));
-        }
-        if (effectivePage < totalPages - 1) {
-            response.links.put("next", baseUrl + queryParams + "&page=" + (effectivePage + 1));
-        }
-
-        response.links.put("last", baseUrl + queryParams + "&page=" + (totalPages - 1));
+        var response = new GeneroSearchResponse(generos, totalElements, totalPages, hasMore, nextPage);
 
         return Response.ok(response).build();
     }

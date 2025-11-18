@@ -1,90 +1,44 @@
--- This file allow to write SQL commands that will be emitted in test and dev.
--- The commands are commented as their support depends of the database
--- insert into myentity (id, field) values(1, 'field-1');
--- insert into myentity (id, field) values(2, 'field-2');
--- insert into myentity (id, field) values(3, 'field-3');
--- alter sequence myentity_seq restart with 4;
+-- Diretores
+INSERT INTO BiografiaDiretor (id, textoCompleto, resumo, premiosRecebidos) VALUES
+(1, 'Hayao Miyazaki é um dos mais célebres cineastas de animação do Japão. Cofundador do Studio Ghibli, ele dirigiu vários filmes aclamados internacionalmente, conhecidos por seus temas recorrentes de humanismo, ambientalismo e pacifismo. Suas obras frequentemente apresentam protagonistas femininas fortes e exploram a relação entre a humanidade e a natureza.', 'Cofundador do Studio Ghibli e aclamado diretor de animação.', 'Oscar, Urso de Ouro, Leão de Ouro'),
+(2, 'Isao Takahata foi um diretor, produtor e roteirista japonês. Cofundador do Studio Ghibli, ele era conhecido por seu estilo realista e dramas comoventes que exploravam a sociedade e a história japonesa. Seu trabalho é marcado por uma abordagem experimental e um profundo senso de humanidade.', 'Cofundador do Studio Ghibli, conhecido por seus dramas realistas.', 'Prêmio do Festival de Annecy, Ordem das Artes e das Letras'),
+(3, 'Gorō Miyazaki é um diretor de animação japonês e filho de Hayao Miyazaki. Ele dirigiu vários filmes no Studio Ghibli, trazendo uma nova perspectiva para o estúdio. Embora seu trabalho seja influenciado por seu pai, ele desenvolveu um estilo próprio, explorando temas de identidade e pertencimento.', 'Diretor de animação do Studio Ghibli e filho de Hayao Miyazaki.', 'Prêmios da Academia Japonesa'),
+(4, 'Hiromasa Yonebayashi é um animador e diretor japonês que trabalhou no Studio Ghibli por muitos anos. Seus filmes são conhecidos por sua beleza visual e narrativas delicadas. Ele é o diretor mais jovem a dirigir um filme para o estúdio.', 'Ex-diretor do Studio Ghibli, conhecido por sua animação detalhada.', 'Indicações a prêmios internacionais'),
+(5, 'Yoshifumi Kondō foi um diretor de animação japonês que teve uma carreira promissora no Studio Ghibli. Ele dirigiu apenas um filme, "Sussurros do Coração", antes de seu falecimento prematuro. Seu trabalho é lembrado por sua sensibilidade e atenção aos detalhes da vida cotidiana.', 'Diretor de "Sussurros do Coração", uma promessa do Studio Ghibli.', 'N/A');
+alter sequence biografiaDiretor_seq restart with 6;
 
-insert into book (id, titulo, autor, editora, anoLancamento, estaDisponivel) values(1, 'Aventuras na Vila do Sol', 'Ana Clara', 'Luz do Saber', 2022, true);
-insert into book (id, titulo, autor, editora, anoLancamento, estaDisponivel) values(2, 'O Enigma do Farol', 'Dr. Alistair Finch', 'Páginas Antigas', 2018, true);
-insert into book (id, titulo, autor, editora, anoLancamento, estaDisponivel) values(3, 'Crônicas de Orion', 'Helena Valois', 'Galáxia Editorial', 2024, false);
-insert into book (id, titulo, autor, editora, anoLancamento, estaDisponivel) values(4, 'O Jardim Secreto de Maria', 'Julia Santos', 'Florescer Livros', 2021, false);
-alter sequence book_seq restart with 5;
-insert into BiografiaDiretor (textoCompleto, resumo, premiosRecebidos) values(
-                                                                                 'Tim Burton é um diretor, produtor e roteirista americano conhecido por seu estilo gótico e excêntrico. Ele começou sua carreira como animador na Disney. Suas obras frequentemente exploram temas de solidão, individualidade e o estranho, com uma estética visual marcante e sombria. É um dos diretores mais reconhecidos de sua geração.',
-                                                                                 'Diretor de cinema com estilo gótico e excêntrico',
-                                                                                 'Globo de Ouro, BAFTA, indicações ao Oscar'
-                                                                             );
+INSERT INTO Diretor (id, nome, nascimento, nacionalidade, biografia_id) VALUES
+(1, 'Hayao Miyazaki', '1941-01-05', 'Japonesa', 1),
+(2, 'Isao Takahata', '1935-10-29', 'Japonesa', 2),
+(3, 'Gorō Miyazaki', '1967-01-21', 'Japonesa', 3),
+(4, 'Hiromasa Yonebayashi', '1973-07-10', 'Japonesa', 4),
+(5, 'Yoshifumi Kondō', '1950-03-31', 'Japonesa', 5);
+alter sequence diretor_seq restart with 6;
 
-insert into BiografiaDiretor (textoCompleto, resumo, premiosRecebidos) values(
-                                                                                 'Wes Anderson é um diretor americano com um estilo visual distintivo, caracterizado por simetria, cores vibrantes, planos detalhados e um senso de humor peculiar. Ele é conhecido por suas narrativas sobre famílias disfuncionais e personagens peculiares. Suas obras são imediatamente reconhecíveis.',
-                                                                                 'Diretor com estilo visual simétrico e colorido',
-                                                                                 'Urso de Prata (Berlim), BAFTA, indicações ao Oscar'
-                                                                             );
+-- Gêneros
+INSERT INTO Genero (id, nome, descricao) VALUES
+(1, 'Fantasia', 'Filmes com elementos mágicos e mundos fantásticos'),
+(2, 'Aventura', 'Jornadas épicas, descobertas e desafios pessoais'),
+(3, 'Família', 'Filmes adequados para todas as idades'),
+(4, 'Drama', 'Narrativas emocionais profundas sobre a condição humana'),
+(5, 'Romance', 'Histórias centradas no amor e nos relacionamentos'),
+(6, 'Guerra', 'Filmes que retratam conflitos armados e suas consequências');
+alter sequence genero_seq restart with 7;
 
-insert into BiografiaDiretor (textoCompleto, resumo, premiosRecebidos) values(
-                                                                                 'Denis Villeneuve é um diretor canadense aclamado pela crítica por seus filmes de ficção científica e suspense. Suas obras são conhecidas por sua atmosfera densa, cinematografia imersiva e temas complexos, como identidade, tempo e humanidade. Ele se tornou uma das vozes mais importantes do cinema de gênero contemporâneo.',
-                                                                                 'Diretor de ficção científica e suspense com obras aclamadas',
-                                                                                 'Prêmio do Sindicato dos Diretores da América, indicações ao Oscar'
-                                                                             );
 
-insert into BiografiaDiretor (textoCompleto, resumo, premiosRecebidos) values(
-                                                                                 'Greta Gerwig é uma diretora e atriz americana que ganhou destaque por suas narrativas sobre a jornada de crescimento e autodescoberta feminina. Suas obras são elogiadas pela autenticidade, diálogos inteligentes e personagens complexos. Ela é uma das diretoras mais influentes da atualidade.',
-                                                                                 'Diretora e atriz com foco em narrativas femininas',
-                                                                                 'Indicações ao Oscar (Melhor Direção e Roteiro)'
-                                                                             );
+-- Filmes
+INSERT INTO Filme (id, titulo, sinopse, anoLancamento, nota, idadeIndicativa, diretor_id, status) VALUES
+(1, 'A Viagem de Chihiro', 'Chihiro, uma menina de 10 anos, se aventura em um mundo mágico e misterioso governado por deuses, bruxas e espíritos.', 2001, 9.3, 0, 1, 'FORA_DE_CARTAZ'),
+(2, 'Meu Vizinho Totoro', 'Duas irmãs se mudam para o campo para ficar perto de sua mãe doente e fazem amizade com os espíritos da floresta que vivem nas proximidades.', 1988, 8.2, 0, 1, 'FORA_DE_CARTAZ'),
+(3, 'O Castelo Animado', 'Uma jovem é amaldiçoada por uma bruxa e se transforma em uma mulher idosa. Para quebrar o feitiço, ela busca a ajuda de um mago excêntrico que vive em um castelo ambulante.', 2004, 8.7, 0, 1, 'FORA_DE_CARTAZ'),
+(4, 'Princesa Mononoke', 'Ashitaka, um príncipe de uma tribo Emishi, se envolve em um conflito entre os deuses de uma floresta e os humanos que a exploram.', 1997, 8.4, 12, 1, 'FORA_DE_CARTAZ'),
+(5, 'O Túmulo dos Vagalumes', 'Dois irmãos lutam para sobreviver no Japão durante os últimos meses da Segunda Guerra Mundial.', 1988, 8.5, 12, 2, 'FORA_DE_CARTAZ');
+alter sequence filme_seq restart with 6;
 
-insert into diretor (nome, nascimento, nacionalidade, biografia_id) values('Tim Burton', '1958-08-25', 'Americana', 1);
-insert into diretor (nome, nascimento, nacionalidade, biografia_id) values('Wes Anderson', '1969-05-01', 'Americana', 2);
-insert into diretor (nome, nascimento, nacionalidade, biografia_id) values('Denis Villeneuve', '1967-10-03', 'Canadense', 3);
-insert into diretor (nome, nascimento, nacionalidade, biografia_id) values('Greta Gerwig', '1983-08-04', 'Americana', 4);
-
-insert into genero (nome, descricao) values('Ficção Científica', 'Histórias com tecnologia avançada, exploração espacial ou futuros distópicos');
-insert into genero (nome, descricao) values('Comédia', 'Filmes que buscam provocar riso e diversão');
-insert into genero (nome, descricao) values('Suspense', 'Obras que constroem tensão e mistério para a audiência');
-insert into genero (nome, descricao) values('Fantasia Sombria', 'Mistura de fantasia com elementos góticos e de horror');
-insert into genero (nome, descricao) values('Aventura', 'Jornadas épicas, descobertas e desafios pessoais');
-insert into genero (nome, descricao) values('Drama', 'Narrativas emocionais profundas sobre a condição humana');
-
-insert into filme (titulo, sinopse, anoLancamento, nota, idadeIndicativa, diretor_id, status) values(
-                                                                                                'Duna',
-                                                                                                'O herdeiro de uma família nobre, Paul Atreides, é incumbido de proteger o planeta mais valioso da galáxia de forças malignas. O planeta é a única fonte de "especiaria", uma droga que prolonga a vida humana.',
-                                                                                                2021, 9.1, 14, 3, 'EM_CARTAZ'
-                                                                                            );
-
-insert into filme (titulo, sinopse, anoLancamento, nota, idadeIndicativa, diretor_id, status) values(
-                                                                                                'Blade Runner 2049',
-                                                                                                'Um jovem "blade runner" descobre um segredo enterrado há muito tempo que tem o potencial de mergulhar o que resta da sociedade no caos.',
-                                                                                                2017, 8.8, 16, 3, 'FORA_DE_CARTAZ'
-                                                                                            );
-
-insert into filme (titulo, sinopse, anoLancamento, nota, idadeIndicativa, diretor_id, status) values(
-                                                                                                'Beetlejuice',
-                                                                                                'Um casal recém-falecido contrata um bio-exorcista para assustar os novos e irritantes moradores de sua casa.',
-                                                                                                1988, 8.5, 12, 1, 'FORA_DE_CARTAZ'
-                                                                                            );
-
-insert into filme (titulo, sinopse, anoLancamento, nota, idadeIndicativa, diretor_id, status) values(
-                                                                                                'O Fantástico Sr. Raposo',
-                                                                                                'Um raposo, que deixou a vida de ladrão para se dedicar à família, volta aos velhos hábitos e coloca em risco a vida de todos ao seu redor.',
-                                                                                                2009, 8.2, 0, 2, 'FORA_DE_CARTAZ'
-                                                                                            );
-
-insert into filme (titulo, sinopse, anoLancamento, nota, idadeIndicativa, diretor_id, status) values(
-                                                                                                'Lady Bird: A Hora de Voar',
-                                                                                                'Uma estudante do último ano do ensino médio navega em um relacionamento tumultuado com sua mãe enquanto sonha em se mudar para uma cidade grande para a faculdade.',
-                                                                                                2017, 8.6, 14, 4, 'FORA_DE_CARTAZ'
-                                                                                            );
-
-insert into filme (titulo, sinopse, anoLancamento, nota, idadeIndicativa, diretor_id, status) values(
-                                                                                                'Interestelar',
-                                                                                                'Um grupo de exploradores espaciais viaja através de um buraco de minhoca em busca de um novo lar para a humanidade, que está à beira da extinção na Terra.',
-                                                                                                2014, 9.3, 12, 3, 'FORA_DE_CARTAZ'
-                                                                                            );
-
-insert into filme_genero (filme_id, genero_id) values (1, 1), (1, 6), (1, 5);
-insert into filme_genero (filme_id, genero_id) values (2, 1), (2, 3), (2, 6);
-insert into filme_genero (filme_id, genero_id) values (3, 2), (3, 4);
-insert into filme_genero (filme_id, genero_id) values (4, 2), (4, 5);
-insert into filme_genero (filme_id, genero_id) values (5, 6), (5, 2);
-insert into filme_genero (filme_id, genero_id) values (6, 1), (6, 6), (6, 5);
+-- Relacionamento Filme-Gênero
+INSERT INTO filme_genero (filme_id, genero_id) VALUES
+(1, 1), (1, 2), (1, 3), (1, 4),
+(2, 1), (2, 3),
+(3, 1), (3, 2), (3, 5),
+(4, 1), (4, 2), (4, 6),
+(5, 4), (5, 6);
