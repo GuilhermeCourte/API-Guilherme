@@ -13,6 +13,8 @@ import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.acme.security.ApiKeyRequired;
 import org.acme.security.Idempotent;
+// NOVO IMPORT NECESSÁRIO
+import org.eclipse.microprofile.openapi.annotations.security.SecurityRequirement;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,16 +25,16 @@ public class BookResource {
 
     @GET
     @Operation( // Dando uma descrição no nosso swagger sobre o que faz a rota
-        summary = "Retorna todos os livros (getAll)",
-        description = "Retorna uma lista de livros por padrão no formato JSON"
+            summary = "Retorna todos os livros (getAll)",
+            description = "Retorna uma lista de livros por padrão no formato JSON"
     )
     @APIResponse( // Detalha algumas coisas na parte de responses no swagger
-        responseCode = "200",
-        description = "Retornado a lista corretamente",
-        content = @Content(
-            mediaType = "application/json",
-            schema = @Schema(implementation = Book.class, type = SchemaType.ARRAY) // O implementation é a classe especifica que estou utilizando e o tipo é um arraylist class
-        )
+            responseCode = "200",
+            description = "Retornado a lista corretamente",
+            content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = Book.class, type = SchemaType.ARRAY) // O implementation é a classe especifica que estou utilizando e o tipo é um arraylist class
+            )
     )
     public Response getAll(){
         return Response.ok(Book.listAll()).build(); // index que retorna todos os livros cadastrados, por isso não possui um path
@@ -118,28 +120,29 @@ public class BookResource {
     };
 
     @POST // não é necessário um path pois temos apenas um post
+    @SecurityRequirement(name = "api_key") // <<--- Adicionado para mostrar o campo no Swagger UI
     @Idempotent
     @ApiKeyRequired
     @RequestBody( // Explica o esquema da requisão
             required = true,
             content = @Content(
-                mediaType = "application/json",
-                schema = @Schema(implementation = Book.class)
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = Book.class)
             )
     )
     @APIResponse( // Requisição 201
-        responseCode = "201",
-        description = "Created",
-        content = @Content(
-            mediaType = "application/json",
-            schema = @Schema(implementation = Book.class))
+            responseCode = "201",
+            description = "Created",
+            content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = Book.class))
     )
     @APIResponse( // Requisição
-        responseCode = "400",
-        description = "Bad Request",
-        content = @Content(
-            mediaType = "text/plain",
-            schema = @Schema(implementation = String.class))
+            responseCode = "400",
+            description = "Bad Request",
+            content = @Content(
+                    mediaType = "text/plain",
+                    schema = @Schema(implementation = String.class))
     )
     @Transactional
     public Response insert(Book book){
