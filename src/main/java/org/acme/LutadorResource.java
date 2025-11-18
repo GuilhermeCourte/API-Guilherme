@@ -179,7 +179,7 @@ public class LutadorResource {
     )
     @Transactional
     public Response insert(@Valid Lutador lutador){
-
+        lutador.id = null; // Garante que um novo ID será gerado
         // Resolver treinador (pode ter apenas id)
         if(lutador.treinador != null && lutador.treinador.id != null){
             Treinador t = Treinador.findById(lutador.treinador.id);
@@ -212,7 +212,7 @@ public class LutadorResource {
         }
 
         Lutador.persist(lutador);
-        return Response.status(Response.Status.CREATED).build();
+        return Response.status(Response.Status.CREATED).entity(lutador).build();
     }
 
     @DELETE

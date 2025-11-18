@@ -160,8 +160,9 @@ public class CategoriaDePesoResource {
     )
     @Transactional
     public Response insert(@Valid CategoriaDePeso categoriaDePeso){
+        categoriaDePeso.id = null; // Garante que um novo ID será gerado
         CategoriaDePeso.persist(categoriaDePeso);
-        return Response.status(Response.Status.CREATED).build();
+        return Response.status(Response.Status.CREATED).entity(categoriaDePeso).build();
     }
 
     @DELETE
