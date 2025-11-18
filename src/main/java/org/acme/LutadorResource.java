@@ -16,43 +16,43 @@ import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.acme.security.ApiKeyRequired;
 import org.acme.security.Idempotent;
 
-import org.acme.dto.FilmeSearchResponse;
+import org.acme.dto.LutadorSearchResponse;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-@Path("/filmes")
-public class FilmeResource {
+@Path("/lutadores")
+public class LutadorResource {
 
     @GET
     @Operation(
-            summary = "Retorna todos os filmes (getAll)",
-            description = "Retorna uma lista de filmes por padrão no formato JSON"
+            summary = "Retorna todas as lutas/carreiras (getAll)",
+            description = "Retorna uma lista de lutas ou carreiras de boxe no formato JSON"
     )
     @APIResponse(
             responseCode = "200",
             description = "Lista retornada com sucesso",
             content = @Content(
                     mediaType = "application/json",
-                    schema = @Schema(implementation = Filme.class, type = SchemaType.ARRAY)
+                    schema = @Schema(implementation = Lutador.class, type = SchemaType.ARRAY)
             )
     )
     public Response getAll(){
-        return Response.ok(Filme.listAll()).build();
+        return Response.ok(Lutador.listAll()).build();
     }
 
     @GET
     @Path("{id}")
     @Operation(
-        summary = "Retorna um filme pela busca por ID (getById)",
-        description = "Retorna um filme específico pela busca de ID colocado na URL no formato JSON por padrão"
+        summary = "Retorna uma luta/carreira pela busca por ID (getById)",
+        description = "Retorna uma luta ou carreira de boxe específica pela busca de ID colocado na URL no formato JSON por padrão"
     )
     @APIResponse(
             responseCode = "200",
             description = "Item retornado com sucesso",
             content = @Content(
                     mediaType = "application/json",
-                    schema = @Schema(implementation = Filme.class, type = SchemaType.ARRAY)
+                    schema = @Schema(implementation = Lutador.class, type = SchemaType.ARRAY)
             )
     )
     @APIResponse(
@@ -63,9 +63,9 @@ public class FilmeResource {
                     schema = @Schema(implementation = String.class))
     )
     public Response getById(
-            @Parameter(description = "Id do filme a ser pesquisado", required = true)
+            @Parameter(description = "Id da luta/carreira a ser pesquisada", required = true)
             @PathParam("id") long id){
-        Filme entity = Filme.findById(id);
+        Lutador entity = Lutador.findById(id);
         if(entity == null){
             return Response.status(Response.Status.NOT_FOUND).build();
         }
@@ -74,31 +74,31 @@ public class FilmeResource {
 
     @GET
     @Operation(
-            summary = "Retorna os filmes conforme o sistema de pesquisa (search)",
-            description = "Retorna uma lista de filmes filtrada conforme a pesquisa por padrão no formato JSON"
+            summary = "Retorna lutas/carreiras conforme o sistema de pesquisa (search)",
+            description = "Retorna uma lista de lutas ou carreiras de boxe filtrada conforme a pesquisa por padrão no formato JSON"
     )
     @APIResponse(
             responseCode = "200",
             description = "Item retornado com sucesso",
             content = @Content(
                     mediaType = "application/json",
-                    schema = @Schema(implementation = FilmeSearchResponse.class)
+                    schema = @Schema(implementation = LutadorSearchResponse.class)
             )
     )
     @Path("/search")
     public Response search(
-            @Parameter(description = "Query de buscar por titulo, ano de lançamento ou idade indicativa")
+            @Parameter(description = "Query de buscar por nome do lutador, ano de nascimento ou número de vitórias")
             @QueryParam("q") String q,
             @Parameter(description = "Campo de ordenação da lista de retorno")
             @QueryParam("sort") @DefaultValue("id") String sort,
-            @Parameter(description = "Esquema de filtragem de filmes por ordem crescente ou decrescente")
+            @Parameter(description = "Esquema de filtragem de lutadores por ordem crescente ou decrescente")
             @QueryParam("direction") @DefaultValue("asc") String direction,
             @Parameter(description = "Define qual página será retornada na response")
             @QueryParam("page") @DefaultValue("0") int page,
             @Parameter(description = "Define quantos objetos serão retornados por query")
             @QueryParam("size") @DefaultValue("4") int size
     ){
-        Set<String> allowed = Set.of("id", "titulo", "sinopse", "anoLancamento", "nota", "idadeIndicativa", "status");
+        Set<String> allowed = Set.of("id", "nome", "historia", "anoNascimento", "ranking", "vitorias", "statusCarreira");
         if(!allowed.contains(sort)){
             sort = "id";
         }
@@ -110,26 +110,26 @@ public class FilmeResource {
 
         int effectivePage = Math.max(page, 0);
 
-        PanacheQuery<Filme> query;
+        PanacheQuery<Lutador> query;
 
         if (q == null || q.isBlank()) {
-            query = Filme.findAll(sortObj);
+            query = Lutador.findAll(sortObj);
         } else {
             try {
                 // Tenta converter a pesquisa em número
                 int numero = Integer.parseInt(q);
 
                 // Busca apenas em campos numéricos
-                query = Filme.find(
-                        "anoLancamento = ?1 or idadeIndicativa = ?1",
+                query = Lutador.find(
+                        "anoNascimento = ?1 or vitorias = ?1",
                         sortObj,
                         numero
                 );
 
             } catch (NumberFormatException e) {
                 // se não for número, busca só em campos textuais
-                query = Filme.find(
-                        "lower(titulo) like ?1",
+                query = Lutador.find(
+                        "lower(nome) like ?1",
                         sortObj,
                         "%" + q.toLowerCase() + "%"
                 );
@@ -138,13 +138,13 @@ public class FilmeResource {
 
         long totalElements = query.count();
         int totalPages = query.pageCount();
-        List<Filme> filmes = query.page(effectivePage, size).list();
+        List<Lutador> lutadores = query.page(effectivePage, size).list();
 
         boolean hasMore = effectivePage < totalPages - 1;
-        String nextPage = hasMore ? String.format("/filmes/search?q=%s&sort=%s&direction=%s&page=%d&size=%d",
+        String nextPage = hasMore ? String.format("/lutadores/search?q=%s&sort=%s&direction=%s&page=%d&size=%d",
                 q != null ? q : "", sort, direction, effectivePage + 1, size) : null;
 
-        var response = new FilmeSearchResponse(filmes, totalElements, totalPages, hasMore, nextPage);
+        var response = new LutadorSearchResponse(lutadores, totalElements, totalPages, hasMore, nextPage);
 
         return Response.ok(response).build();
     }
@@ -153,14 +153,14 @@ public class FilmeResource {
     @Idempotent
     @ApiKeyRequired
     @Operation(
-            summary = "Adiciona um registro a lista de filmes (insert)",
-            description = "Adiciona um item a lista de filmes por meio de POST e request body JSON"
+            summary = "Adiciona um registro a lista de lutas/carreiras (insert)",
+            description = "Adiciona um item a lista de lutas ou carreiras de boxe por meio de POST e request body JSON"
     )
     @RequestBody(
             required = true,
             content = @Content(
                     mediaType = "application/json",
-                    schema = @Schema(implementation = Filme.class)
+                    schema = @Schema(implementation = Lutador.class)
             )
     )
     @APIResponse(
@@ -168,7 +168,7 @@ public class FilmeResource {
             description = "Created",
             content = @Content(
                     mediaType = "application/json",
-                    schema = @Schema(implementation = Filme.class))
+                    schema = @Schema(implementation = Lutador.class))
     )
     @APIResponse(
             responseCode = "400",
@@ -178,48 +178,48 @@ public class FilmeResource {
                     schema = @Schema(implementation = String.class))
     )
     @Transactional
-    public Response insert(@Valid Filme filme){
+    public Response insert(@Valid Lutador lutador){
 
-        // Resolver diretor (pode ter apenas id)
-        if(filme.diretor != null && filme.diretor.id != null){
-            Diretor d = Diretor.findById(filme.diretor.id);
-            if(d == null){
+        // Resolver treinador (pode ter apenas id)
+        if(lutador.treinador != null && lutador.treinador.id != null){
+            Treinador t = Treinador.findById(lutador.treinador.id);
+            if(t == null){
                 return Response.status(Response.Status.BAD_REQUEST)
-                        .entity("Diretor com id " + filme.diretor.id + " não existe").build();
+                        .entity("Treinador com id " + lutador.treinador.id + " não existe").build();
             }
-            filme.diretor = d;
+            lutador.treinador = t;
         } else {
-            filme.diretor = null;
+            lutador.treinador = null;
         }
 
-        // Resolver generos (se vierem com id)
-        if(filme.generos != null && !filme.generos.isEmpty()){
-            Set<Genero> resolved = new HashSet<>();
-            for(Genero g : filme.generos){
-                if(g == null || g.id == 0){
+        // Resolver categorias de peso (se vierem com id)
+        if(lutador.categoriasDePeso != null && !lutador.categoriasDePeso.isEmpty()){
+            Set<CategoriaDePeso> resolved = new HashSet<>();
+            for(CategoriaDePeso c : lutador.categoriasDePeso){
+                if(c == null || c.id == 0){
                     continue;
                 }
-                Genero fetched = Genero.findById(g.id);
+                CategoriaDePeso fetched = CategoriaDePeso.findById(c.id);
                 if(fetched == null){
                     return Response.status(Response.Status.BAD_REQUEST)
-                            .entity("Genero com id " + g.id + " não existe").build();
+                            .entity("Categoria de peso com id " + c.id + " não existe").build();
                 }
                 resolved.add(fetched);
             }
-            filme.generos = resolved;
+            lutador.categoriasDePeso = resolved;
         } else {
-            filme.generos = new HashSet<>();
+            lutador.categoriasDePeso = new HashSet<>();
         }
 
-        Filme.persist(filme);
+        Lutador.persist(lutador);
         return Response.status(Response.Status.CREATED).build();
     }
 
     @DELETE
     @ApiKeyRequired
     @Operation(
-            summary = "Remove um registro da lista de filmes (delete)",
-            description = "Remove um item da lista de filmes por meio de Id na URL"
+            summary = "Remove um registro da lista de lutas/carreiras (delete)",
+            description = "Remove um item da lista de lutas ou carreiras de boxe por meio de Id na URL"
     )
     @APIResponse(
             responseCode = "204",
@@ -238,30 +238,30 @@ public class FilmeResource {
     @Transactional
     @Path("{id}")
     public Response delete(@PathParam("id") long id){
-        Filme entity = Filme.findById(id);
+        Lutador entity = Lutador.findById(id);
         if(entity == null){
             return Response.status(Response.Status.NOT_FOUND).build();
         }
 
         // Remove associações ManyToMany antes de deletar
-        entity.generos.clear();
+        entity.categoriasDePeso.clear();
         entity.persist(); // atualiza o estado
 
-        Filme.deleteById(id);
+        Lutador.deleteById(id);
         return Response.noContent().build();
     }
 
     @PUT
     @ApiKeyRequired
     @Operation(
-            summary = "Altera um registro da lista de filmes (update)",
-            description = "Edita um item da lista de filmes por meio de Id na URL e request body JSON"
+            summary = "Altera um registro da lista de lutas/carreiras (update)",
+            description = "Edita um item da lista de lutas ou carreiras de boxe por meio de Id na URL e request body JSON"
     )
     @RequestBody(
             required = true,
             content = @Content(
                     mediaType = "application/json",
-                    schema = @Schema(implementation = Filme.class)
+                    schema = @Schema(implementation = Lutador.class)
             )
     )
     @APIResponse(
@@ -269,7 +269,7 @@ public class FilmeResource {
             description = "Item editado com sucesso",
             content = @Content(
                     mediaType = "application/json",
-                    schema = @Schema(implementation = Filme.class, type = SchemaType.ARRAY)
+                    schema = @Schema(implementation = Lutador.class, type = SchemaType.ARRAY)
             )
     )
     @APIResponse(
@@ -281,45 +281,45 @@ public class FilmeResource {
     )
     @Transactional
     @Path("{id}")
-    public Response update(@PathParam("id") long id,@Valid Filme newFilme){
-        Filme entity = Filme.findById(id);
+    public Response update(@PathParam("id") long id,@Valid Lutador newLutador){
+        Lutador entity = Lutador.findById(id);
         if(entity == null){
             return Response.status(Response.Status.NOT_FOUND).build();
         }
-        entity.titulo = newFilme.titulo;
-        entity.sinopse = newFilme.sinopse;
-        entity.anoLancamento = newFilme.anoLancamento;
-        entity.nota = newFilme.nota;
-        entity.idadeIndicativa = newFilme.idadeIndicativa;
-        entity.status = newFilme.status;
+        entity.nome = newLutador.nome;
+        entity.historia = newLutador.historia;
+        entity.anoNascimento = newLutador.anoNascimento;
+        entity.ranking = newLutador.ranking;
+        entity.vitorias = newLutador.vitorias;
+        entity.statusCarreira = newLutador.statusCarreira;
 
-        // Resolver diretor
-        if(newFilme.diretor != null && newFilme.diretor.id != null){
-            Diretor d = Diretor.findById(newFilme.diretor.id);
-            if(d == null){
+        // Resolver treinador
+        if(newLutador.treinador != null && newLutador.treinador.id != null){
+            Treinador t = Treinador.findById(newLutador.treinador.id);
+            if(t == null){
                 return Response.status(Response.Status.BAD_REQUEST)
-                        .entity("Diretor com id " + newFilme.diretor.id + " não existe").build();
+                        .entity("Treinador com id " + newLutador.treinador.id + " não existe").build();
             }
-            entity.diretor = d;
+            entity.treinador = t;
         } else {
-            entity.diretor = null;
+            entity.treinador = null;
         }
 
-        // Resolver generos
-        if(newFilme.generos != null){
-            Set<Genero> resolved = new HashSet<>();
-            for(Genero g : newFilme.generos){
-                if(g == null || g.id == 0) continue;
-                Genero fetched = Genero.findById(g.id);
+        // Resolver categorias de peso
+        if(newLutador.categoriasDePeso != null){
+            Set<CategoriaDePeso> resolved = new HashSet<>();
+            for(CategoriaDePeso c : newLutador.categoriasDePeso){
+                if(c == null || c.id == 0) continue;
+                CategoriaDePeso fetched = CategoriaDePeso.findById(c.id);
                 if(fetched == null){
                     return Response.status(Response.Status.BAD_REQUEST)
-                            .entity("Genero com id " + g.id + " não existe").build();
+                            .entity("Categoria de peso com id " + c.id + " não existe").build();
                 }
                 resolved.add(fetched);
             }
-            entity.generos = resolved;
+            entity.categoriasDePeso = resolved;
         } else {
-            entity.generos = new HashSet<>();
+            entity.categoriasDePeso = new HashSet<>();
         }
 
         return Response.status(Response.Status.OK).entity(entity).build();

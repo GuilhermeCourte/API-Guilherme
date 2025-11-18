@@ -1,17 +1,17 @@
 package org.acme.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.acme.Diretor;
+import org.acme.Lutador;
 
 import java.util.List;
 
-public class DiretorSearchResponse {
+public class LutadorSearchResponse {
 
-    @JsonProperty("Diretores")
-    private List<Diretor> diretores;
+    @JsonProperty("Lutadores")
+    private List<Lutador> lutadores;
 
-    @JsonProperty("TotalDiretores")
-    private long totalDiretores;
+    @JsonProperty("TotalLutadores")
+    private long totalLutadores;
 
     @JsonProperty("TotalPages")
     private int totalPages;
@@ -22,9 +22,9 @@ public class DiretorSearchResponse {
     @JsonProperty("NextPage")
     private String nextPage;
 
-    public DiretorSearchResponse(List<Diretor> diretores, long totalDiretores, int totalPages, boolean hasMore, String nextPage) {
-        this.diretores = diretores;
-        this.totalDiretores = totalDiretores;
+    public LutadorSearchResponse(List<Lutador> lutadores, long totalLutadores, int totalPages, boolean hasMore, String nextPage) {
+        this.lutadores = lutadores;
+        this.totalLutadores = totalLutadores;
         this.totalPages = totalPages;
         this.hasMore = hasMore;
         this.nextPage = nextPage;

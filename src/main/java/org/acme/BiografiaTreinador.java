@@ -6,7 +6,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 
 @Entity
-public class BiografiaDiretor extends PanacheEntityBase {
+public class BiografiaTreinador extends PanacheEntityBase {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Long id;
@@ -20,14 +20,14 @@ public class BiografiaDiretor extends PanacheEntityBase {
 
     public String premiosRecebidos;
 
-    // One-to-One: uma biografia pertence a um diretor
+    // One-to-One: uma biografia pertence a um treinador
     @OneToOne(mappedBy = "biografia", fetch = FetchType.LAZY)
     @JsonIgnore
-    public Diretor diretor;
+    public Treinador treinador;
 
-    public BiografiaDiretor() {}
+    public BiografiaTreinador() {}
 
-    public BiografiaDiretor(String textoCompleto, String resumo, String premiosRecebidos) {
+    public BiografiaTreinador(String textoCompleto, String resumo, String premiosRecebidos) {
         this.textoCompleto = textoCompleto;
         this.resumo = resumo;
         this.premiosRecebidos = premiosRecebidos;

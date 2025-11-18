@@ -16,41 +16,41 @@ import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.acme.security.ApiKeyRequired;
 import org.acme.security.Idempotent;
 
-import org.acme.dto.DiretorSearchResponse;
+import org.acme.dto.CategoriaDePesoSearchResponse;
 import java.util.List;
 import java.util.Set;
 
-@Path("/diretores")
-public class DiretorResource {
+@Path("/categoriasdepeso")
+public class CategoriaDePesoResource {
     @GET
     @Operation(
-            summary = "Retorna todos os diretores (getAll)",
-            description = "Retorna uma lista de diretores por padrão no formato JSON"
+            summary = "Retorna todas as categorias de peso (getAll)",
+            description = "Retorna uma lista de categorias de peso no formato JSON"
     )
     @APIResponse(
             responseCode = "200",
             description = "Lista retornada com sucesso",
             content = @Content(
                     mediaType = "application/json",
-                    schema = @Schema(implementation = Diretor.class, type = SchemaType.ARRAY)
+                    schema = @Schema(implementation = CategoriaDePeso.class, type = SchemaType.ARRAY)
             )
     )
     public Response getAll(){
-        return Response.ok(Diretor.listAll()).build();
+        return Response.ok(CategoriaDePeso.listAll()).build();
     }
 
     @GET
     @Path("{id}")
     @Operation(
-            summary = "Retorna um diretor pela busca por ID (getById)",
-            description = "Retorna um diretor específico pela busca de ID colocado na URL no formato JSON por padrão"
+            summary = "Retorna uma categoria de peso pela busca por ID (getById)",
+            description = "Retorna uma categoria de peso específica pela busca de ID colocado na URL no formato JSON por padrão"
     )
     @APIResponse(
             responseCode = "200",
             description = "Item retornado com sucesso",
             content = @Content(
                     mediaType = "application/json",
-                    schema = @Schema(implementation = Diretor.class, type = SchemaType.ARRAY)
+                    schema = @Schema(implementation = CategoriaDePeso.class, type = SchemaType.ARRAY)
             )
     )
     @APIResponse(
@@ -61,9 +61,9 @@ public class DiretorResource {
                     schema = @Schema(implementation = String.class))
     )
     public Response getById(
-            @Parameter(description = "Id do diretor a ser pesquisado", required = true)
+            @Parameter(description = "Id da categoria de peso a ser pesquisada", required = true)
             @PathParam("id") long id){
-        Diretor entity = Diretor.findById(id);
+        CategoriaDePeso entity = CategoriaDePeso.findById(id);
         if(entity == null){
             return Response.status(Response.Status.NOT_FOUND).build();
         }
@@ -72,31 +72,31 @@ public class DiretorResource {
 
     @GET
     @Operation(
-            summary = "Retorna os diretores conforme o sistema de pesquisa (search)",
-            description = "Retorna uma lista de diretores filtrada conforme a pesquisa por padrão no formato JSON"
+            summary = "Retorna categorias de peso conforme o sistema de pesquisa (search)",
+            description = "Retorna uma lista de categorias de peso filtrada conforme a pesquisa por padrão no formato JSON"
     )
     @APIResponse(
             responseCode = "200",
             description = "Item retornado com sucesso",
             content = @Content(
                     mediaType = "application/json",
-                    schema = @Schema(implementation = DiretorSearchResponse.class)
+                    schema = @Schema(implementation = CategoriaDePesoSearchResponse.class)
             )
     )
     @Path("/search")
     public Response search(
-            @Parameter(description = "Query de buscar por nome ou nacionalidade")
+            @Parameter(description = "Query de buscar por nome da categoria de peso")
             @QueryParam("q") String q,
             @Parameter(description = "Campo de ordenação da lista de retorno")
             @QueryParam("sort") @DefaultValue("id") String sort,
-            @Parameter(description = "Esquema de filtragem de diretores por ordem crescente ou decrescente")
+            @Parameter(description = "Esquema de filtragem de categorias de peso por ordem crescente ou decrescente")
             @QueryParam("direction") @DefaultValue("asc") String direction,
             @Parameter(description = "Define qual página será retornada na response")
             @QueryParam("page") @DefaultValue("0") int page,
             @Parameter(description = "Define quantos objetos serão retornados por query")
             @QueryParam("size") @DefaultValue("4") int size
     ){
-        Set<String> allowed = Set.of("id", "nome", "nascimento", "nacionalidade");
+        Set<String> allowed = Set.of("id", "nome", "descricao");
         if(!allowed.contains(sort)){
             sort = "id";
         }
@@ -108,24 +108,24 @@ public class DiretorResource {
 
         int effectivePage = Math.max(page, 0);
 
-        PanacheQuery<Diretor> query;
+        PanacheQuery<CategoriaDePeso> query;
 
         if (q == null || q.isBlank()) {
-            query = Diretor.findAll(sortObj);
+            query = CategoriaDePeso.findAll(sortObj);
         } else {
-            query = Diretor.find(
-                    "lower(nome) like ?1 or lower(nacionalidade) like ?1", sortObj, "%" + q.toLowerCase() + "%");
+            query = CategoriaDePeso.find(
+                    "lower(nome) like ?1", sortObj, "%" + q.toLowerCase() + "%");
         }
 
         long totalElements = query.count();
         int totalPages = query.pageCount();
-        List<Diretor> diretores = query.page(effectivePage, size).list();
+        List<CategoriaDePeso> categorias = query.page(effectivePage, size).list();
 
         boolean hasMore = effectivePage < totalPages - 1;
-        String nextPage = hasMore ? String.format("/diretores/search?q=%s&sort=%s&direction=%s&page=%d&size=%d",
+        String nextPage = hasMore ? String.format("/categoriasdepeso/search?q=%s&sort=%s&direction=%s&page=%d&size=%d",
                 q != null ? q : "", sort, direction, effectivePage + 1, size) : null;
 
-        var response = new DiretorSearchResponse(diretores, totalElements, totalPages, hasMore, nextPage);
+        var response = new CategoriaDePesoSearchResponse(categorias, totalElements, totalPages, hasMore, nextPage);
 
         return Response.ok(response).build();
     }
@@ -134,14 +134,14 @@ public class DiretorResource {
     @Idempotent
     @ApiKeyRequired
     @Operation(
-            summary = "Adiciona um registro a lista de diretores (insert)",
-            description = "Adiciona um item a lista de diretores por meio de POST e request body JSON"
+            summary = "Adiciona um registro a lista de categorias de peso (insert)",
+            description = "Adiciona um item a lista de categorias de peso por meio de POST e request body JSON"
     )
     @RequestBody(
             required = true,
             content = @Content(
                     mediaType = "application/json",
-                    schema = @Schema(implementation = Diretor.class)
+                    schema = @Schema(implementation = CategoriaDePeso.class)
             )
     )
     @APIResponse(
@@ -149,7 +149,7 @@ public class DiretorResource {
             description = "Created",
             content = @Content(
                     mediaType = "application/json",
-                    schema = @Schema(implementation = Diretor.class))
+                    schema = @Schema(implementation = CategoriaDePeso.class))
     )
     @APIResponse(
             responseCode = "400",
@@ -159,16 +159,16 @@ public class DiretorResource {
                     schema = @Schema(implementation = String.class))
     )
     @Transactional
-    public Response insert(@Valid Diretor diretor){
-        Diretor.persist(diretor);
+    public Response insert(@Valid CategoriaDePeso categoriaDePeso){
+        CategoriaDePeso.persist(categoriaDePeso);
         return Response.status(Response.Status.CREATED).build();
     }
 
     @DELETE
     @ApiKeyRequired
     @Operation(
-            summary = "Remove um registro da lista de diretores (delete)",
-            description = "Remove um item da lista de diretores por meio de Id na URL"
+            summary = "Remove um registro da lista de categorias de peso (delete)",
+            description = "Remove um item da lista de categorias de peso por meio de Id na URL"
     )
     @APIResponse(
             responseCode = "204",
@@ -186,7 +186,7 @@ public class DiretorResource {
     )
     @APIResponse(
             responseCode = "409",
-            description = "Conflito - Diretor possui filmes vinculados",
+            description = "Conflito - Categoria de peso possui lutadores vinculados",
             content = @Content(
                     mediaType = "text/plain",
                     schema = @Schema(implementation = String.class))
@@ -194,33 +194,33 @@ public class DiretorResource {
     @Transactional
     @Path("{id}")
     public Response delete(@PathParam("id") long id){
-        Diretor entity = Diretor.findById(id);
+        CategoriaDePeso entity = CategoriaDePeso.findById(id);
         if(entity == null){
             return Response.status(Response.Status.NOT_FOUND).build();
         }
 
-        long filmesVinculados = Filme.count("diretor.id = ?1", id);
-        if(filmesVinculados > 0){
+        long lutadoresVinculados = Lutador.count("?1 MEMBER OF categoriasDePeso", entity);
+        if(lutadoresVinculados > 0){
             return Response.status(Response.Status.CONFLICT)
-                    .entity("Não é possível deletar diretor. Existem " + filmesVinculados + " filme(s) vinculado(s).")
+                    .entity("Não é possível deletar categoria de peso. Existem " + lutadoresVinculados + " lutador(es) vinculado(s).")
                     .build();
         }
 
-        Diretor.deleteById(id);
+        CategoriaDePeso.deleteById(id);
         return Response.noContent().build();
     }
 
     @PUT
     @ApiKeyRequired
     @Operation(
-            summary = "Altera um registro da lista de diretores (update)",
-            description = "Edita um item da lista de diretores por meio de Id na URL e request body JSON"
+            summary = "Altera um registro da lista de categorias de peso (update)",
+            description = "Edita um item da lista de categorias de peso por meio de Id na URL e request body JSON"
     )
     @RequestBody(
             required = true,
             content = @Content(
                     mediaType = "application/json",
-                    schema = @Schema(implementation = Diretor.class)
+                    schema = @Schema(implementation = CategoriaDePeso.class)
             )
     )
     @APIResponse(
@@ -228,7 +228,7 @@ public class DiretorResource {
             description = "Item editado com sucesso",
             content = @Content(
                     mediaType = "application/json",
-                    schema = @Schema(implementation = Diretor.class, type = SchemaType.ARRAY)
+                    schema = @Schema(implementation = CategoriaDePeso.class, type = SchemaType.ARRAY)
             )
     )
     @APIResponse(
@@ -240,26 +240,13 @@ public class DiretorResource {
     )
     @Transactional
     @Path("{id}")
-    public Response update(@PathParam("id") long id, @Valid Diretor newDiretor){
-        Diretor entity = Diretor.findById(id);
+    public Response update(@PathParam("id") long id,@Valid CategoriaDePeso newCategoriaDePeso){
+        CategoriaDePeso entity = CategoriaDePeso.findById(id);
         if(entity == null){
             return Response.status(Response.Status.NOT_FOUND).build();
         }
-        entity.nome = newDiretor.nome;
-        entity.nascimento = newDiretor.nascimento;
-        entity.nacionalidade = newDiretor.nacionalidade;
-        // Atualizar biografia (será criada automaticamente se não existir devido ao CascadeType.ALL)
-        if(newDiretor.biografia != null){
-            if(entity.biografia == null){
-                entity.biografia = new BiografiaDiretor();
-            }
-            entity.biografia.textoCompleto = newDiretor.biografia.textoCompleto;
-            entity.biografia.resumo = newDiretor.biografia.resumo;
-            entity.biografia.premiosRecebidos = newDiretor.biografia.premiosRecebidos;
-        } else {
-            // Se não vier biografia no request, limpa a biografia existente
-            entity.biografia = null;
-        }
+        entity.nome = newCategoriaDePeso.nome;
+        entity.descricao = newCategoriaDePeso.descricao;
 
         return Response.status(Response.Status.OK).entity(entity).build();
     }
