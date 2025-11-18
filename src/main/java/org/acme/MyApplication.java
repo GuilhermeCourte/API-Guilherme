@@ -11,7 +11,7 @@ import jakarta.ws.rs.core.Application;
 @ApplicationPath("/")
 @OpenAPIDefinition(
     info = @Info(
-        title = "Boxing API",
+        title = "api-boxing",
         version = "1.0.0",
         description = "An API for managing boxers, coaches, and weight classes."
     )
