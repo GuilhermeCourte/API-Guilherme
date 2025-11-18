@@ -11,6 +11,7 @@ import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.media.Content;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
+import java.time.LocalDate;
 
 @Path("/apikeys")
 public class ApiKeyResource {
@@ -19,7 +20,7 @@ public class ApiKeyResource {
     @Transactional
     @Operation(
         summary = "Cria uma nova chave de API",
-        description = "Cria uma nova chave de API com uma descrição opcional."
+        description = "Cria uma nova chave de API com uma chave e uma descrição."
     )
     @RequestBody(
         required = true,
@@ -37,12 +38,13 @@ public class ApiKeyResource {
         )
     )
     public Response createApiKey(ApiKey apiKey) {
-        if (apiKey.id == null || apiKey.id.isBlank()) {
-            return Response.status(Response.Status.BAD_REQUEST).entity("A chave (id) da API não pode ser vazia.").build();
+        if (apiKey.apiKey == null || apiKey.apiKey.isBlank()) {
+            return Response.status(Response.Status.BAD_REQUEST).entity("A chave (apiKey) da API não pode ser vazia.").build();
         }
-        if (ApiKey.findById(apiKey.id) != null) {
+        if (ApiKey.findById(apiKey.apiKey) != null) {
             return Response.status(Response.Status.CONFLICT).entity("A chave de API já existe.").build();
         }
+        apiKey.creationDate = LocalDate.now();
         ApiKey.persist(apiKey);
         return Response.status(Response.Status.CREATED).entity(apiKey).build();
     }

@@ -12,14 +12,14 @@ public class ApiKey extends PanacheEntityBase {
     @Id
     public String apiKey;
 
-    public String clientName;
+    public String description;
 
     public LocalDate creationDate;
 
-    public static ApiKey generate(String clientName) {
+    public static ApiKey generate(String description) {
         ApiKey apiKey = new ApiKey();
         apiKey.apiKey = UUID.randomUUID().toString();
-        apiKey.clientName = clientName;
+        apiKey.description = description;
         apiKey.creationDate = LocalDate.now();
         return apiKey;
     }
