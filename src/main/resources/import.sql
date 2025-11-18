@@ -41,3 +41,6 @@ INSERT INTO lutador_categoriadepeso (lutador_id, categoriadepeso_id) VALUES
 (3, 3),
 (4, 1),
 (5, 3);
+
+-- Chave de API
+INSERT INTO ApiKey (id, description) VALUES ('minha-chave-secreta', 'Chave de acesso principal');
