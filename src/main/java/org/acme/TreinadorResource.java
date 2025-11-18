@@ -160,9 +160,13 @@ public class TreinadorResource {
     )
     @Transactional
     public Response insert(@Valid Treinador treinador){
-        treinador.id = null; // Garante que um novo ID será gerado
-        Treinador.persist(treinador);
-        return Response.status(Response.Status.CREATED).entity(treinador).build();
+        Treinador newTreinador = new Treinador();
+        newTreinador.nome = treinador.nome;
+        newTreinador.nascimento = treinador.nascimento;
+        newTreinador.nacionalidade = treinador.nacionalidade;
+        newTreinador.biografia = treinador.biografia;
+        Treinador.persist(newTreinador);
+        return Response.status(Response.Status.CREATED).entity(newTreinador).build();
     }
 
     @DELETE

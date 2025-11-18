@@ -179,7 +179,14 @@ public class LutadorResource {
     )
     @Transactional
     public Response insert(@Valid Lutador lutador){
-        lutador.id = null; // Garante que um novo ID será gerado
+        Lutador newLutador = new Lutador();
+        newLutador.nome = lutador.nome;
+        newLutador.historia = lutador.historia;
+        newLutador.anoNascimento = lutador.anoNascimento;
+        newLutador.ranking = lutador.ranking;
+        newLutador.vitorias = lutador.vitorias;
+        newLutador.statusCarreira = lutador.statusCarreira;
+        
         // Resolver treinador (pode ter apenas id)
         if(lutador.treinador != null && lutador.treinador.id != null){
             Treinador t = Treinador.findById(lutador.treinador.id);
@@ -187,9 +194,9 @@ public class LutadorResource {
                 return Response.status(Response.Status.BAD_REQUEST)
                         .entity("Treinador com id " + lutador.treinador.id + " não existe").build();
             }
-            lutador.treinador = t;
+            newLutador.treinador = t;
         } else {
-            lutador.treinador = null;
+            newLutador.treinador = null;
         }
 
         // Resolver categorias de peso (se vierem com id)
@@ -206,13 +213,13 @@ public class LutadorResource {
                 }
                 resolved.add(fetched);
             }
-            lutador.categoriasDePeso = resolved;
+            newLutador.categoriasDePeso = resolved;
         } else {
-            lutador.categoriasDePeso = new HashSet<>();
+            newLutador.categoriasDePeso = new HashSet<>();
         }
 
-        Lutador.persist(lutador);
-        return Response.status(Response.Status.CREATED).entity(lutador).build();
+        Lutador.persist(newLutador);
+        return Response.status(Response.Status.CREATED).entity(newLutador).build();
     }
 
     @DELETE
